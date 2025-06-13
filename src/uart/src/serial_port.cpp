@@ -1237,3 +1237,17 @@ bool SerialPort::SearchDriverFiles(const std::string &path, std::vector<std::str
     // 返回搜索结果
     return result;
 }
+bool SerialPort::init(SerialPort &serialPort, const std::string &yamlFileName, DataReceivedHandler handler)
+{
+    SerialPortParam serialPortParam; // 加载串口参数
+    if (!SerialPortParam::LoadFromYamlFile(yamlFileName, &serialPortParam))
+        return -1;
+    if (!serialPort.SetParam(serialPortParam))
+        return -1;                                                // 设置串口参数
+    serialPort.RegisterDataReceivedHandler(handler, &serialPort); // 注册串口的数据接收回调函数
+    if (!serialPort.Init())
+        return -1; // 初始化串口
+
+    if (!serialPort.Open())
+        return -1; // 打开串口
+}
